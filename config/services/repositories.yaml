@@ -1,0 +1,9 @@
+services:
+    # Person domain
+    App\Domain\Person\Repository\PersonRepositoryInterface: '@App\Infrastructure\Person\Repository\Doctrine\PersonRepository'
+    App\Domain\Person\Repository\CountryRepositoryInterface: '@App\Infrastructure\Person\Repository\Doctrine\CountryRepository'
+    App\Domain\Person\Repository\LoginRepositoryInterface: '@App\Infrastructure\Person\Repository\Doctrine\LoginRepository'
+    App\Domain\Person\Repository\LoginLinkRepositoryInterface: '@App\Infrastructure\Person\Repository\Doctrine\LoginLinkRepository'
+    App\Domain\Person\Repository\CheckLoginByUserIdentifierExistsInterface: '@App\Infrastructure\Person\Repository\Doctrine\LoginRepository'
+    App\Domain\Person\Repository\ContactRepositoryInterface: '@App\Infrastructure\Person\Repository\Doctrine\ContactRepository'
+    App\Domain\Person\Repository\ProfileRepositoryInterface : '@App\Infrastructure\Person\Repository\Doctrine\ProfileRepository'

@@ -1,0 +1,12 @@
+services:
+    # Person domain
+    App\Domain\Person\Service\PasswordGeneratorServiceInterface: '@App\Infrastructure\Person\Service\PasswordGenerator'
+    App\Domain\Person\Service\ContactManagerInterface: '@App\Infrastructure\Person\Service\ContactManager'
+
+    # Shared
+    App\Domain\Shared\Service\ArrayToObjectHydratorServiceInterface: '@App\Infrastructure\Shared\Service\ArrayToObjectHydratorService'
+    App\Domain\Shared\Doctrine\Persistence\TransactionManagerInterface: '@App\Infrastructure\Shared\Doctrine\Persistence\TransactionManager'
+
+    # Dictionary
+    App\Domain\Dictionary\Repository\PersonDictionaryRepositoryInterface : '@App\Infrastructure\Dictionary\Repository\PersonDictionaryRepository'
+    App\Domain\Dictionary\Repository\ReviseStatusDictionaryRepositoryInterface : '@App\Infrastructure\Dictionary\Repository\ReviseStatusDictionaryRepository'

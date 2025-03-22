@@ -1,0 +1,4 @@
+services:
+    # Person domain
+    App\Domain\Person\Specification\Checker\LoginNameUniquenessCheckerInterface: '@App\Infrastructure\Person\Specification\LoginNameUniquenessChecker'
+    App\Domain\Document\Specification\Checker\DocumentsPackageVerificationCheckerInterface: '@App\Infrastructure\Document\Specification\DocumentsPackageVerificationChecker'

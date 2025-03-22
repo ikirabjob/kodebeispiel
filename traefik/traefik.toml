@@ -1,0 +1,36 @@
+defaultEntryPoints = ["http", "https"]
+
+[web]
+# Port for the status page
+address = ":8080"
+
+[entryPoints]
+  [entryPoints.http]
+  address = ":8080"
+
+[http.middlewares]
+  [http.middlewares.testHeader.headers]
+    accessControlAllowMethods= ["GET", "OPTIONS", "PUT"]
+    accessControlAllowOrigin = "*"
+    accessControlMaxAge = 100
+    addVaryHeader = true
+
+[retry]
+
+[docker]
+endpoint = "unix:///var/run/docker.sock"
+domain = "localhost"
+watch = true
+exposedByDefault = false
+
+[acme]
+email = "failhunter.by@gmail.com"
+storage = "acme.json"
+entryPoint = "https"
+onHostRule = true
+
+[acme.httpChallenge]
+  entryPoint = "http"
+
+[[acme.domains]]
+  main = "localhost"

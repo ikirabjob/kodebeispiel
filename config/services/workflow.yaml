@@ -1,0 +1,5 @@
+services:
+    Symfony\Component\Workflow\WorkflowInterface: ~
+
+    App\Infrastructure\Shared\Workflow\WorkflowFactory:
+        arguments: [ '@event_dispatcher' ]

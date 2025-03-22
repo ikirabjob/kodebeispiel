@@ -1,0 +1,103 @@
+services:
+  traefik:
+    image: traefik:2.8.3
+    container_name: traefik
+    command:
+      - --api=true
+      - --api.dashboard=false
+      - --log.level=info
+      - --entrypoints.web.address=:8080
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --certificatesresolvers.le.acme.email=<test@gmail.com>
+      - --certificatesresolvers.le.acme.storage=/etc/traefik/acme/acme.json
+      - --certificatesresolvers.le.acme.tlschallenge=true
+    labels:
+      - "traefik.http.middlewares.testheader.headers.accesscontrolallowmethods=GET,OPTIONS,PUT,POST,PATCH"
+      - "traefik.http.middlewares.testheader.headers.accessControlAllowOriginList=*"
+      - "traefik.http.middlewares.testheader.headers.accesscontrolmaxage=100"
+      - "traefik.http.middlewares.testheader.headers.accesscontrolallowcredentials=true"
+      - "traefik.http.middlewares.testheader.headers.addvaryheader=true"
+      - "traefik.http.routers.traefik.middlewares=testheader"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+#      - ./traefik/traefik.toml:/etc/traefik/traefik.toml:ro
+      - ./traefik/acme:/etc/traefik/acme
+    ports:
+      - "8080:8080"
+
+  database:
+    image: postgres:14
+    restart: ${RESTART_POLICY}
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    expose:
+      - "5432"
+    ports:
+      - "5432:5432"
+    labels:
+      - "traefik.enable=false"
+    volumes:
+      - './docker/volumes/pgsql:/var/lib/postgresql'
+      - './docker/db/scripts:/docker-entrypoint-initdb.d'
+
+  app-worker:
+    build:
+      context: .
+      dockerfile: docker/php-worker/Dockerfile
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+        USERID: ${USERID}
+    volumes:
+      - './docker/php-worker/supervisord.d/symfony-async-worker.conf:/etc/supervisord.d/symfony-async-worker.conf'
+      - './:/app'
+    restart: ${RESTART_POLICY}
+    depends_on:
+      - database
+    labels:
+      - "traefik.enable=false"
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/php-fpm/Dockerfile
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+        USERID: ${USERID}
+    volumes:
+      - './:/app/'
+      - '/vendor/'
+    container_name: backend
+    restart: ${RESTART_POLICY}
+    depends_on:
+      - database
+    expose:
+      - 9000
+
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+        USERID: ${USERID}
+    volumes:
+      - './:/app/'
+    restart: ${RESTART_POLICY}
+    depends_on:
+      - database
+      - backend
+    labels:
+      - traefik.enable=true
+      - "traefik.http.middlewares.testheader.headers.accesscontrolallowmethods=GET,OPTIONS,PUT,POST,PATCH"
+      - "traefik.http.middlewares.testheader.headers.accessControlAllowOriginList=*"
+      - "traefik.http.middlewares.testheader.headers.accesscontrolallowcredentials=true"
+      - "traefik.http.middlewares.testheader.headers.accesscontrolmaxage=100"
+      - "traefik.http.middlewares.testheader.headers.addvaryheader=true"
+      - "traefik.http.routers.traefik.middlewares=testheader"
+      - traefik.http.services.backend.loadbalancer.server.port=80
+      - traefik.http.routers.backend.rule=Host("${APP_BACKEND_HOST}")
+    
+

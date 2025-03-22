@@ -1,0 +1,13 @@
+#controllers:
+#    resource: ../src/Controller/
+#    type: attribute
+
+api_login_check:
+    path: /api/login_check
+
+api_refresh_token:
+    path: /api/token/refresh
+
+#api_me_status:
+#    path: /get-pdf-template
+#    controller: App\Infrastructure\Document\Controller\PdfGeneratorController::getDocument
